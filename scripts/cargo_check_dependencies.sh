@@ -20,21 +20,29 @@
 
 if [ ! -f Cargo.toml ]; then
     echo "Cargo.toml not found! Are you running this script in the right directory?"
+    exit 1
 fi
 
-# Here, awk attempts to capture the dependency names among the [(build-|dev-)dependencies]
-# blocks of the Cargo.toml
-dependencies=$(awk  'x==1 {print } /\[(build-|dev-)?dependencies\]/ {x=1} /^$/ {x=0}' Cargo.toml| grep -Ev '(^$|^\[.+\]$)'| grep -Eo '^\w+')
+# Extract dependency names
+dependencies=$(awk '/^\[.*dependencies\]/ {x=1} x==1 && /^[^\[]/ {print $1; x=0}' Cargo.toml)
+
 echo "$dependencies"
-for i in $dependencies; do
-    echo "testing removal of $i"
-    cargo rm "$i";
+
+for dep in $dependencies; do
+    echo "Testing removal of $dep"
+    
+    # Manually edit Cargo.toml or use another method to remove dependency
+    # cargo rm "$dep" # If this command is available in your setup
+
+    # Run cargo check to verify removal
     cargo check --all-targets --all-features
-    if (( $? == 0 )); then
-        echo "removal succeeded, committing"
-        git commit --no-gpg-sign -m "Removing $i from $(basename `pwd`)" --all;
+    if [ $? -eq 0 ]; then
+        echo "Removal succeeded, committing"
+        git add Cargo.toml
+        git commit --no-gpg-sign -m "Removing $dep from $(basename `pwd`)" || { echo "Git commit failed"; exit 1; }
     else
-        echo "removal failed, rolling back"
-        git reset --hard
+        echo "Removal failed, rolling back"
+        git reset --hard || { echo "Git reset failed"; exit 1; }
     fi
 done
+

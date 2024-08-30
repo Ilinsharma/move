@@ -21,20 +21,20 @@
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}/language/move-analyzer/editors/code"
             ],
-            "preLaunchTask": "Pretest"
+            "preLaunchTask": "Pretest"  // Ensure this task is defined in tasks.json
         },
         {
             "name": "VS Code Tokenizer Tests",
             "type": "extensionHost",
             "request": "launch",
-            "runtimeExecutable": "${execPath}",
+            "runtimeExecutable": "${execPath}",  // Typically points to the VS Code executable
             "args": [
                 "${workspaceFolder}/language/move-analyzer/editors/code/tests",
                 "--extensionDevelopmentPath=${workspaceFolder}/language/move-analyzer/editors/code",
                 "--extensionTestsPath=${workspaceFolder}/language/move-analyzer/editors/code/out/tests/index.js"
             ],
             "outFiles": ["${workspaceFolder}/language/move-analyzer/editors/code/out/tests/**/*.js"],
-            "preLaunchTask": "Pretest"
+            "preLaunchTask": "Pretest"  // Ensure this task is defined in tasks.json
         }
     ]
 }
